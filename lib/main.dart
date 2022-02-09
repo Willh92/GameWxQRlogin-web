@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:qr_login/constant.dart';
 import 'package:qr_login/web.dart';
 import 'package:qr_login/widget/manu_item.dart';
@@ -11,6 +12,7 @@ import 'bean/menu.dart';
 
 void main() async {
   await initMenu();
+  setUrlStrategy(PathUrlStrategy());
   runApp(const MyApp());
 }
 

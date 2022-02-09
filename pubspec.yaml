@@ -27,6 +27,8 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  flutter_web_plugins:
+    sdk: flutter
   flutter:
     sdk: flutter
   dio: ^4.0.4
