@@ -3,6 +3,8 @@ import 'package:cached_network_image_platform_interface/cached_network_image_pla
 import 'package:flutter/widgets.dart';
 import 'package:qr_login/bean/menu.dart';
 
+import '../common.dart';
+
 @immutable
 class MenuItem extends StatelessWidget {
   final Game game;
@@ -11,12 +13,11 @@ class MenuItem extends StatelessWidget {
     Key? key,
     required this.game,
   }) : super(key: key) {
-    game.icon = game.icon!.replaceAll(
-        "https://mmbiz.qpic.cn/", "https://qr.willh.cn/mm/");
     game.icon = game.icon!
-        .replaceAll("https://mmgame.qpic.cn/image/", "https://qr.willh.cn/m/");
-    game.icon = game.icon!.replaceAll(
-        "https://mmocgame.qpic.cn/wechatgame/", "https://qr.willh.cn/w/");
+        .replaceAll("https://mmbiz.qpic.cn/", "$baseURL/mm/")
+        .replaceAll("https://mmgame.qpic.cn/image/", "$baseURL/m/")
+        .replaceAll(
+            "https://mmocgame.qpic.cn/wechatgame/", "$baseURL/w/");
   }
 
   @override
@@ -27,24 +28,41 @@ class MenuItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         ClipRRect(
-          borderRadius:const BorderRadius.all(Radius.circular(12)),
-          child:CachedNetworkImage(
-              width: 60,
-              height: 60,
-              imageUrl: game.icon!,
-              placeholder: (context, url) => Image.asset(
-                "images/pic_default.png",
-                width: 60,
-                height: 60,
-              ),
-              errorWidget: (context, url, error) => Image.asset(
-                "images/pic_default.png",
-                width: 60,
-                height: 60,
-              ),
-              imageRenderMethodForWeb: ImageRenderMethodForWeb.HtmlImage),
+          borderRadius: const BorderRadius.all(Radius.circular(12)),
+          child: game.py == "azsmxz"
+              ? Image.asset(
+                  "images/icon.png",
+                  width: 60,
+                  height: 60,
+                )
+              : CachedNetworkImage(
+                  width: 60,
+                  height: 60,
+                  imageUrl: game.icon!,
+                  placeholder: (context, url) => Image.asset(
+                        "images/pic_default.png",
+                        width: 60,
+                        height: 60,
+                      ),
+                  errorWidget: (context, url, error) => Image.asset(
+                        "images/pic_default.png",
+                        width: 60,
+                        height: 60,
+                      ),
+                  imageRenderMethodForWeb: ImageRenderMethodForWeb.HtmlImage),
         ),
-        Text(game.name!)
+        Padding(
+          padding: const EdgeInsets.only(top: 6, left: 24, right: 24),
+          child: Text(
+            game.name! + "\n",
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 12,
+            ),
+          ),
+        ),
       ],
     ));
   }

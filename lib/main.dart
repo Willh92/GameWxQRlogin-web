@@ -1,9 +1,6 @@
-import 'dart:convert';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
-import 'package:qr_login/constant.dart';
+import 'package:qr_login/common.dart';
 import 'package:qr_login/web.dart';
 import 'package:qr_login/widget/manu_item.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -45,15 +42,18 @@ class MyApp extends StatelessWidget {
             if (g != null) {
               Game? game = gameList[g];
               if (game != null) {
-                if (isWeChatBrowser()) {
+                if (isWx()) {
                   launch(
-                      "https://open.weixin.qq.com/connect/app/qrconnect?appid=${game.appId!}&bundleid=${game.bundleId!}&scope=snsapi_base,snsapi_userinfo,snsapi_friend,snsapi_message&state=weixin",
+                      "https://open.weixin.qq.com/connect/app/qrconnect?appid=${game
+                          .appId!}&bundleid=${game
+                          .bundleId!}&scope=snsapi_base,snsapi_userinfo,snsapi_friend,snsapi_message&state=weixin",
                       forceSafariVC: false,
                       webOnlyWindowName: "_self");
                   return null;
                 }
                 return MaterialPageRoute(
-                    builder: (context) => WebPage(
+                    builder: (context) =>
+                        WebPage(
                           game: game,
                         ),
                     settings: settings);
@@ -91,7 +91,22 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   // final Dio _dio = Dio();
 
+  @override
+  void initState() {
+    super.initState();
+    if (isAndroid()) {
+      Future.delayed(Duration.zero, () {
+        showAlertDialog(context,
+            isWx() ? "由于安卓系统限制,需点击右上角在浏览器打开，下载扫码APP才能正常扫码登录":"由于安卓系统限制,需下载扫码APP才能正常扫码登录");
+      });
+    }
+  }
+
   void _itemClick(Game game) {
+    if (game.py == "azsmxz") {
+      launch("https://dl.willh.cn/qrlogin.apk");
+      return;
+    }
     Navigator.pushNamed(context, "/game?g=${game.py}");
     // Navigator.push(
     //   context,
@@ -101,32 +116,62 @@ class _MyHomePageState extends State<MyHomePage> {
     // );
   }
 
+  showAlertDialog(BuildContext context, String msg) {
+    //设置对话框
+    AlertDialog alert = AlertDialog(
+      title: const Text("温馨提示"),
+      content: Text(msg),
+      actions: const [],
+    );
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Game> game = gameList.values.toList();
-    final size = MediaQuery.of(context).size;
+    if (!isIos()) {
+      game.insert(0, Game(py: "azsmxz", name: "安卓扫码下载", icon: ""));
+    }
+    final size = MediaQuery
+        .of(context)
+        .size;
     final width = size.width;
+    int crossAxisCount = (width / 120).truncate();
     return Scaffold(
-      appBar: isWeChatBrowser()
+      appBar: isWx()
           ? null
           : AppBar(
-              title: Text(widget.title),
+        title: Text(widget.title),
+      ),
+      body: CustomScrollView(
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.only(top: 24, bottom: 12),
+            sliver: SliverGrid(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                childAspectRatio: 1.25,
+              ),
+              delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+                  Game g = game.elementAt(index);
+                  return GestureDetector(
+                    onTap: () {
+                      _itemClick(g);
+                    },
+                    child: MenuItem(game: g),
+                  );
+                },
+                childCount: game.length,
+              ),
             ),
-      body: GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: (width / 120).truncate(),
-          childAspectRatio: 1.0,
-        ),
-        itemCount: game.length,
-        itemBuilder: (context, index) {
-          Game g = game.elementAt(index);
-          return GestureDetector(
-            onTap: () {
-              _itemClick(g);
-            },
-            child: MenuItem(game: g),
-          );
-        },
+          )
+        ],
       ),
       // body: FutureBuilder(
       //     future: _dio.get(

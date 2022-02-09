@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:qr_login/common.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webviewx/webviewx.dart';
 
@@ -17,7 +18,7 @@ class WebPage extends StatefulWidget {
   WebPage({
     Key? key,
     this.game,
-  })  : url = "https://qr.willh.cn/q/connect/app/qrconnect?appid=${game!.appId!}&bundleid=${game.bundleId!}"
+  })  : url = "$baseURL/q/connect/app/qrconnect?appid=${game!.appId!}&bundleid=${game.bundleId!}"
             "&scope=snsapi_base,snsapi_userinfo,snsapi_friend,snsapi_message&state=weixin",
         super(key: key);
 
@@ -92,9 +93,9 @@ class _WebViewState extends State<WebPage> {
 String _modifyHtml(String data) {
   data = data
       .replaceAll(
-          "https://mmocgame.qpic.cn/wechatgame/", "https://qr.willh.cn/w/")
+          "https://mmocgame.qpic.cn/wechatgame/", "$baseURL/w/")
       .replaceAll(
           "https://res.wx.qq.com/connect/zh_CN/htmledition/js/padauth.js",
-          "https://qr.willh.cn/js/padauth.js");
+          "$baseURL/js/padauth.js");
   return data;
 }

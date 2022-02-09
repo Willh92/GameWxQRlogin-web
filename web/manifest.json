@@ -1,11 +1,11 @@
 {
-    "name": "qr_login",
-    "short_name": "qr_login",
+    "name": "扫码登录",
+    "short_name": "扫码登录",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "微信扫码登录",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
