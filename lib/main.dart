@@ -106,11 +106,12 @@ class _MyHomePageState extends State<MyHomePage> {
     List<Game> game = gameList.values.toList();
     final size = MediaQuery.of(context).size;
     final width = size.width;
-    final height = size.height;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
+      appBar: isWeChatBrowser()
+          ? null
+          : AppBar(
+              title: Text(widget.title),
+            ),
       body: GridView.builder(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: (width / 120).truncate(),
