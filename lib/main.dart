@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:qr_login/common.dart';
+import 'package:qr_login/utils/formatter/TextInputFormatter.dart';
 import 'package:qr_login/web.dart';
 import 'package:qr_login/widget/edit_widget.dart';
 import 'package:qr_login/widget/manu_item.dart';
@@ -78,7 +79,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   late List<Game> allGame;
   late List<Game> game;
 
@@ -115,7 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // );
   }
 
-  void _filter(String str) {
+  void _filter(String str) async {
     List<Game> filter = allGame.where((g) {
       return g.py == "azsmxz" || g.name!.contains(str) || g.py!.contains(str);
     }).toList();
@@ -145,92 +145,97 @@ class _MyHomePageState extends State<MyHomePage> {
     final width = size.width;
     int crossAxisCount = (width / 120).truncate();
     return Scaffold(
-        appBar: isWx()
-            ? null
-            : AppBar(
-                title: Text(widget.title),
-              ),
-        body: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 6),
-                child: EditWidget(
-                    onChanged: (str) {
-                      _filter(str.toLowerCase());
-                    },
-                    hintText: "搜索游戏\"王者荣耀\"或\"wzry\"",
-                    iconWidget: Icon(
-                      Icons.search,
-                      size: 24,
-                      color: Theme.of(context).primaryColor,
-                    )),
-              ),
-              Expanded(
-                  child: CustomScrollView(
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                slivers: [
-                  SliverPadding(
-                    padding: const EdgeInsets.only(top: 0, bottom: 12),
-                    sliver: SliverGrid(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: crossAxisCount,
-                        childAspectRatio: 1.25,
-                      ),
-                      delegate: SliverChildBuilderDelegate(
-                        (BuildContext context, int index) {
-                          Game g = game[index];
-                          return GestureDetector(
-                            key: ValueKey(g.name),
-                            onTap: () {
-                              _itemClick(g);
-                            },
-                            child: MenuItem(game: g),
-                          );
-                        },
-                        childCount: game.length,
-                      ),
-                    ),
-                  )
+      appBar: isWx()
+          ? null
+          : AppBar(
+              title: Text(widget.title),
+            ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: EditWidget(
+                onChanged: (str) {
+                  _filter(str.toLowerCase());
+                },
+                hintText: "搜索王者荣耀(wzry)",
+                inputFormatters: [
+                  LengthTextInputFormatter(100),
+                  FilterTextInputFormatter(
+                    filterPattern: RegExp("[a-zA-Z]|[\u4e00-\u9fa5]|[0-9]|'"),
+                  ),
                 ],
-              )),
-            ],
-            // body: FutureBuilder(
-            //     future: _dio.get(
-            //         "https://qr.willh.cn/graw/Willh92/GameWxQRlogin/main/games/gameList2-min.json"),
-            //     builder: (BuildContext context, AsyncSnapshot snapshot) {
-            //       //请求完成
-            //       if (snapshot.connectionState == ConnectionState.done) {
-            //         //发生错误
-            //         if (snapshot.hasError) {
-            //           return Text(snapshot.error.toString());
-            //         }
-            //         //请求成功
-            //         List<Game> game =
-            //             Menu.fromJson(jsonDecode(snapshot.data.toString())).game!;
-            //         return GridView.builder(
-            //           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            //             crossAxisCount: 3, //每行三列
-            //             childAspectRatio: 1.0,
-            //           ),
-            //           itemCount: game.length,
-            //           itemBuilder: (context, index) {
-            //             Game g = game.elementAt(index);
-            //             return GestureDetector(
-            //               onTap: () {
-            //                 _itemClick(g);
-            //               },
-            //               child: MenuItem(game: g),
-            //             );
-            //           },
-            //         );
-            //       }
-            //       //请求未完成时弹出loading
-            //       return const Center(child: CircularProgressIndicator());
-            //     }),
+                iconWidget: Icon(
+                  Icons.search,
+                  size: 24,
+                  color: Theme.of(context).primaryColor,
+                )),
           ),
-        );
+          Expanded(
+              child: CustomScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            slivers: [
+              SliverPadding(
+                padding: const EdgeInsets.only(top: 0, bottom: 12),
+                sliver: SliverGrid(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    childAspectRatio: 1.25,
+                  ),
+                  delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+                      Game g = game[index];
+                      return GestureDetector(
+                        key: ValueKey(g.name),
+                        onTap: () {
+                          _itemClick(g);
+                        },
+                        child: MenuItem(game: g),
+                      );
+                    },
+                    childCount: game.length,
+                  ),
+                ),
+              )
+            ],
+          )),
+        ],
+        // body: FutureBuilder(
+        //     future: _dio.get(
+        //         "https://qr.willh.cn/graw/Willh92/GameWxQRlogin/main/games/gameList2-min.json"),
+        //     builder: (BuildContext context, AsyncSnapshot snapshot) {
+        //       //请求完成
+        //       if (snapshot.connectionState == ConnectionState.done) {
+        //         //发生错误
+        //         if (snapshot.hasError) {
+        //           return Text(snapshot.error.toString());
+        //         }
+        //         //请求成功
+        //         List<Game> game =
+        //             Menu.fromJson(jsonDecode(snapshot.data.toString())).game!;
+        //         return GridView.builder(
+        //           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        //             crossAxisCount: 3, //每行三列
+        //             childAspectRatio: 1.0,
+        //           ),
+        //           itemCount: game.length,
+        //           itemBuilder: (context, index) {
+        //             Game g = game.elementAt(index);
+        //             return GestureDetector(
+        //               onTap: () {
+        //                 _itemClick(g);
+        //               },
+        //               child: MenuItem(game: g),
+        //             );
+        //           },
+        //         );
+        //       }
+        //       //请求未完成时弹出loading
+        //       return const Center(child: CircularProgressIndicator());
+        //     }),
+      ),
+    );
   }
 }

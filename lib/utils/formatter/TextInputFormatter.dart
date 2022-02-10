@@ -8,9 +8,9 @@ class LengthTextInputFormatter extends TextInputFormatter {
 
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue,
-      TextEditingValue newValue,
-      ) {
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     if (newValue.isComposingRangeValid) return newValue;
     return LengthLimitingTextInputFormatter(maxLength)
         .formatEditUpdate(oldValue, newValue);
@@ -25,9 +25,9 @@ class FilterTextInputFormatter extends TextInputFormatter {
 
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue,
-      TextEditingValue newValue,
-      ) {
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     if (newValue.isComposingRangeValid) return newValue;
     return FilteringTextInputFormatter.allow(filterPattern)
         .formatEditUpdate(oldValue, newValue);

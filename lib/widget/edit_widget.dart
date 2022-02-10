@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../utils/formatter/TextInputFormatter.dart';
+import 'package:flutter/services.dart';
 
 class EditWidget extends StatefulWidget {
   ///输入框文字改变
@@ -15,12 +14,15 @@ class EditWidget extends StatefulWidget {
   ///图标Widget
   bool passwordType = false;
 
+  List<TextInputFormatter>? inputFormatters;
+
   EditWidget({
     Key? key,
     this.onChanged,
     this.hintText = "",
     this.passwordType = false,
     this.iconWidget,
+    this.inputFormatters,
   }) : super(key: key);
 
   @override
@@ -46,15 +48,18 @@ class _EditWidgetState extends State<EditWidget> {
       alignment: AlignmentDirectional.centerStart,
       children: [
         Container(
+          width: double.infinity,
           height: 40,
           alignment: AlignmentDirectional.center,
-          child: TextField(
+          child: TextFormField(
             controller: mController,
             keyboardType: TextInputType.visiblePassword,
             textAlign: TextAlign.left,
             autofocus: false,
             maxLines: 1,
             minLines: 1,
+            style: const TextStyle(
+                height: 1, fontSize: 14, overflow: TextOverflow.ellipsis),
             obscureText: eyeExpand && widget.passwordType,
             onChanged: (text) {
               if (widget.onChanged != null) {
@@ -65,13 +70,7 @@ class _EditWidgetState extends State<EditWidget> {
                 input = text;
               });
             },
-            inputFormatters: [
-              ///输入长度和格式限制
-              LengthTextInputFormatter(100),
-              FilterTextInputFormatter(
-                filterPattern: RegExp("[a-zA-Z]|[\u4e00-\u9fa5]|[0-9]|'"),
-              ),
-            ],
+            inputFormatters: widget.inputFormatters,
 
             ///样式
             decoration: InputDecoration(
@@ -79,8 +78,10 @@ class _EditWidgetState extends State<EditWidget> {
                 filled: true,
                 hintText: widget.hintText,
                 hintStyle: TextStyle(
-                  color: Colors.grey[400],
-                ),
+                    height: 1,
+                    fontSize: 14,
+                    color: Colors.grey[400],
+                    overflow: TextOverflow.ellipsis),
                 border: _getEditBorder(false),
                 focusedBorder: _getEditBorder(true),
                 disabledBorder: _getEditBorder(false),
