@@ -16,8 +16,7 @@ class MenuItem extends StatelessWidget {
     game.icon = game.icon!
         .replaceAll("https://mmbiz.qpic.cn/", "$baseURL/mm/")
         .replaceAll("https://mmgame.qpic.cn/image/", "$baseURL/m/")
-        .replaceAll(
-            "https://mmocgame.qpic.cn/wechatgame/", "$baseURL/w/");
+        .replaceAll("https://mmocgame.qpic.cn/wechatgame/", "$baseURL/w/");
   }
 
   @override
@@ -59,6 +58,7 @@ class MenuItem extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
             style: const TextStyle(
+              height: 1.1,
               fontSize: 12,
             ),
           ),
