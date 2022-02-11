@@ -34,6 +34,7 @@ dependencies:
   dio: ^4.0.4
   cached_network_image: ^3.2.0
   webviewx: ^0.2.1
+  fluro: ^2.0.3
 
 
   # The following adds the Cupertino Icons font to your application.
