@@ -1,3 +1,4 @@
+import 'dart:html';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:qr_login/app/application.dart';
 import 'package:qr_login/common.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:wakelock/wakelock.dart';
 import 'package:webviewx/webviewx.dart';
 
 import '../../bean/menu.dart';
@@ -40,6 +42,10 @@ class _WebViewState extends State<GamePage> {
 
   late WebViewXController webviewController;
 
+  late Future<Response<String>> _myData;
+
+  bool _loadSuccess = false;
+
   @override
   void initState() {
     super.initState();
@@ -48,19 +54,41 @@ class _WebViewState extends State<GamePage> {
         Application.router.navigateTo(context, Routes.home,
             clearStack: true, transition: TransitionType.none);
       });
+    } else {
+      Future.delayed(Duration.zero, () {
+        Wakelock.enable();
+      });
     }
+    _myData = _dio.get(widget.url ?? "");
+    _loadSuccess = false;
+  }
+
+  @override
+  void dispose() {
+    Wakelock.disable();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        floatingActionButton: _loadSuccess
+            ? WebViewAware(
+                child: FloatingActionButton(
+                    child: const Icon(Icons.refresh),
+                    tooltip: "刷新",
+                    onPressed: () {
+                      _reload();
+                    }),
+              )
+            : null,
         appBar: AppBar(
           title: Text(widget.game?.name ?? ""),
         ),
         body: widget.url == null
             ? const Text("游戏不存在")
             : FutureBuilder(
-                future: _dio.get(widget.url!),
+                future: _myData,
                 builder: (BuildContext context, AsyncSnapshot snapshot) {
                   final size = MediaQuery.of(context).size;
                   final width = size.width;
@@ -69,9 +97,22 @@ class _WebViewState extends State<GamePage> {
                   if (snapshot.connectionState == ConnectionState.done) {
                     //发生错误
                     if (snapshot.hasError) {
-                      return Text(snapshot.error.toString());
+                      print(snapshot.error.toString());
+                      Future.delayed(Duration.zero, () {
+                        setState(() {
+                          _loadSuccess = true;
+                        });
+                      });
+                      return const Text("加载失败");
                     }
                     //请求成功
+                    if (!_loadSuccess) {
+                      Future.delayed(Duration.zero, () {
+                        setState(() {
+                          _loadSuccess = true;
+                        });
+                      });
+                    }
                     return WebViewX(
                         initialContent: _modifyHtml(snapshot.data.toString()),
                         initialSourceType: SourceType.html,
@@ -90,12 +131,20 @@ class _WebViewState extends State<GamePage> {
                               callBack: (msg) {
                                 Uri? uri = Uri.tryParse(msg.trimLeft());
                                 if (uri != null) {
-                                  if ("oauth" == uri.authority) {
-                                    String? code = uri.queryParameters["code"];
-                                    launch(
-                                        "${uri.scheme}://${uri.authority}?code=$code",
-                                        forceSafariVC: false,
-                                        webOnlyWindowName: "_self");
+                                  switch (uri.authority) {
+                                    case "oauth":
+                                      String? code =
+                                          uri.queryParameters["code"];
+                                      launch(
+                                          "${uri.scheme}://${uri.authority}?code=$code",
+                                          forceSafariVC: false,
+                                          webOnlyWindowName: "_self");
+                                      break;
+                                    case "refresh":
+                                      _reload();
+                                      break;
+                                    default:
+                                      break;
                                   }
                                 }
                               })
@@ -104,17 +153,25 @@ class _WebViewState extends State<GamePage> {
                         height: height,
                         javascriptMode: JavascriptMode.unrestricted);
                   }
-                  //请求未完成时弹出loading
                   return const Center(child: CircularProgressIndicator());
                 }));
   }
-}
 
-String _modifyHtml(String data) {
-  data = data
-      .replaceAll("https://mmocgame.qpic.cn/wechatgame/", "$baseURL/w/")
-      .replaceAll(
-          "https://res.wx.qq.com/connect/zh_CN/htmledition/js/padauth.js",
-          "$baseURL/js/padauth.js");
-  return data;
+  String _modifyHtml(String data) {
+    data = data
+        .replaceAll("https://mmbiz.qpic.cn/", "$baseURL/mm/")
+        .replaceAll("https://mmgame.qpic.cn/image/", "$baseURL/m/")
+        .replaceAll("https://mmocgame.qpic.cn/wechatgame/", "$baseURL/w/")
+        .replaceAll(
+            "https://res.wx.qq.com/connect/zh_CN/htmledition/js/padauth.js",
+            "$baseURL/js/padauth.js");
+    return data;
+  }
+
+  void _reload() {
+    setState(() {
+      _loadSuccess = false;
+      _myData = _dio.get(widget.url!);
+    });
+  }
 }

@@ -5,6 +5,6 @@ import 'package:qr_login/ui/root/root_page.dart';
 
 void main() async {
   await initMenu();
-  // setUrlStrategy(PathUrlStrategy());
+  setUrlStrategy(PathUrlStrategy());
   runApp(const RootPage());
 }
