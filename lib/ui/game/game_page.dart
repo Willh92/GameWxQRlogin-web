@@ -58,8 +58,9 @@ class _WebViewState extends State<GamePage> {
               "https://open.weixin.qq.com/connect/app/qrconnect?appid=${widget.game?.appId}&bundleid=${widget.game?.bundleId!}&scope=snsapi_base,snsapi_userinfo,snsapi_friend,snsapi_message&state=weixin",
               forceSafariVC: false,
               webOnlyWindowName: "_self");
-          Application.router.navigateTo(context, Routes.home,
-              clearStack: true, transition: TransitionType.none);
+          Application.router.pop(context);
+          // Application.router.navigateTo(context, Routes.home,
+          //     clearStack: true, transition: TransitionType.none);
         });
       } else {
         Future.delayed(Duration.zero, () {

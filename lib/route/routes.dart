@@ -4,7 +4,6 @@ import 'package:qr_login/common.dart';
 import 'package:qr_login/route/route_handlers.dart';
 
 import '../app/application.dart';
-import '../ui/home/home_page.dart';
 
 abstract class Routes {
   static String home = "/";

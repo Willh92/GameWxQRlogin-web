@@ -12,7 +12,6 @@ class RootPage extends StatefulWidget {
 }
 
 class _RootPageState extends State<RootPage> {
-
   _RootPageState() {
     final router = FluroRouter();
     Routes.configureRoutes(router);
@@ -27,36 +26,7 @@ class _RootPageState extends State<RootPage> {
         primarySwatch: Colors.blue,
       ),
       onGenerateRoute: Application.router.generator,
-      // onGenerateRoute: (settings) {
-      //   final settingsUri = Uri.parse(settings.name!);
-      //   switch (settingsUri.path) {
-      //     case "/game":
-      //       String? g = settingsUri.queryParameters["g"];
-      //       if (g != null) {
-      //         Game? game = gameList[g];
-      //         if (game != null) {
-      //           if (isWx()) {
-      //             launch(
-      //                 "https://open.weixin.qq.com/connect/app/qrconnect?appid=${game.appId!}&bundleid=${game.bundleId!}&scope=snsapi_base,snsapi_userinfo,snsapi_friend,snsapi_message&state=weixin",
-      //                 forceSafariVC: false,
-      //                 webOnlyWindowName: "_self");
-      //             return null;
-      //           }
-      //           return MaterialPageRoute(
-      //               builder: (context) => WebPage(
-      //                 game: game,
-      //               ),
-      //               settings: settings);
-      //         }
-      //       }
-      //       return null;
-      //     default:
-      //   }
-      //   return MaterialPageRoute(
-      //       builder: (context) => const MyHomePage(title: '扫码登录'),
-      //       settings: settings);
-      // },settings
+      initialRoute: Routes.home,
     );
-    //    print("initial route = ${app.initialRoute}");
   }
 }
