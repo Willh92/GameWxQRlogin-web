@@ -34,21 +34,28 @@ class MenuItem extends StatelessWidget {
                   width: 60,
                   height: 60,
                 )
-              : CachedNetworkImage(
-                  width: 60,
-                  height: 60,
-                  imageUrl: game.icon!,
-                  placeholder: (context, url) => Image.asset(
-                        "images/pic_default.png",
-                        width: 60,
-                        height: 60,
-                      ),
-                  errorWidget: (context, url, error) => Image.asset(
-                        "images/pic_default.png",
-                        width: 60,
-                        height: 60,
-                      ),
-                  imageRenderMethodForWeb: ImageRenderMethodForWeb.HtmlImage),
+              : game.py == "grlxz"
+                  ? Image.asset(
+                      "images/identity.png",
+                      width: 60,
+                      height: 60,
+                    )
+                  : CachedNetworkImage(
+                      width: 60,
+                      height: 60,
+                      imageUrl: game.icon!,
+                      placeholder: (context, url) => Image.asset(
+                            "images/pic_default.png",
+                            width: 60,
+                            height: 60,
+                          ),
+                      errorWidget: (context, url, error) => Image.asset(
+                            "images/pic_default.png",
+                            width: 60,
+                            height: 60,
+                          ),
+                      imageRenderMethodForWeb:
+                          ImageRenderMethodForWeb.HtmlImage),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 6, left: 24, right: 24),

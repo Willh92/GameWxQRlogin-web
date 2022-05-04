@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../app/application.dart';
 import '../../bean/menu.dart';
+import '../../route/routes.dart';
 import '../../utils/formatter/TextInputFormatter.dart';
 import '../../widget/edit_widget.dart';
 import '../../widget/manu_item.dart';
@@ -34,6 +35,7 @@ class _HomePageState extends State<HomePage> {
       });
     }
     allGame = gameList.values.toList();
+    allGame.insert(0, Game(py: "grlxz", name: "解除人脸限制", icon: ""));
     if (!isIos()) {
       allGame.insert(0, Game(py: "azsmxz", name: "安卓扫码下载", icon: ""));
     }
@@ -43,6 +45,16 @@ class _HomePageState extends State<HomePage> {
   void _itemClick(Game game) {
     if (game.py == "azsmxz") {
       launch("https://dl.willh.cn/qrlogin.apk");
+      return;
+    } else if (game.py == "grlxz") {
+      if (isWx()) {
+        launch(
+            "https://jiazhang.qq.com/healthy/dist/faceRecognition/recognition.html?from=openlink&isNew=1&hA=&hasLogin=true",
+            forceSafariVC: false,
+            webOnlyWindowName: "_self");
+      } else {
+        Navigator.pushNamed(context, Routes.identity);
+      }
       return;
     }
     if (isWx()) {
@@ -57,7 +69,10 @@ class _HomePageState extends State<HomePage> {
 
   void _filter(String str) async {
     List<Game> filter = allGame.where((g) {
-      return g.py == "azsmxz" || g.name!.contains(str) || g.py!.contains(str);
+      return g.name!.contains(str) ||
+          g.py!.contains(str) ||
+          g.py == "azsmxz" ||
+          g.py == "grlxz";
     }).toList();
     setState(() {
       game = filter;

@@ -2,6 +2,7 @@ import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_login/ui/game/game_page.dart';
 import 'package:qr_login/ui/home/home_page.dart';
+import 'package:qr_login/ui/identity/identity_page.dart';
 
 import '../bean/menu.dart';
 import '../common.dart';
@@ -21,4 +22,9 @@ var gameRouteHandler = Handler(
   return GamePage(
     game: game,
   );
+});
+
+var identityHandler = Handler(
+    handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
+  return const IdentityPage();
 });

@@ -8,6 +8,7 @@ import '../ui/home/home_page.dart';
 abstract class Routes {
   static String home = "/";
   static String game = "/game";
+  static String identity = "/identity";
 
   static void configureRoutes(FluroRouter router) {
     router.notFoundHandler = Handler(
@@ -18,6 +19,8 @@ abstract class Routes {
         handler: homeHandler, transitionType: TransitionType.inFromRight);
     router.define(game,
         handler: gameRouteHandler, transitionType: TransitionType.inFromRight);
+    router.define(identity,
+        handler: identityHandler, transitionType: TransitionType.inFromRight);
   }
 }
 
