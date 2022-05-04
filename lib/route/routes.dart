@@ -1,9 +1,9 @@
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
+import 'package:qr_login/common.dart';
 import 'package:qr_login/route/route_handlers.dart';
 
 import '../app/application.dart';
-import '../ui/home/home_page.dart';
 
 abstract class Routes {
   static String home = "/";
@@ -18,7 +18,9 @@ abstract class Routes {
     router.define(home,
         handler: homeHandler, transitionType: TransitionType.inFromRight);
     router.define(game,
-        handler: gameRouteHandler, transitionType: TransitionType.inFromRight);
+        handler: gameRouteHandler,
+        transitionType:
+            isWx() ? TransitionType.none : TransitionType.inFromRight);
     router.define(identity,
         handler: identityHandler, transitionType: TransitionType.inFromRight);
   }

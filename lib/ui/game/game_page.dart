@@ -1,6 +1,3 @@
-import 'dart:html';
-import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
@@ -55,9 +52,21 @@ class _WebViewState extends State<GamePage> {
             clearStack: true, transition: TransitionType.none);
       });
     } else {
-      Future.delayed(Duration.zero, () {
-        Wakelock.enable();
-      });
+      if (isWx()) {
+        Future.delayed(Duration.zero, () async {
+          await launch(
+              "https://open.weixin.qq.com/connect/app/qrconnect?appid=${widget.game?.appId}&bundleid=${widget.game?.bundleId!}&scope=snsapi_base,snsapi_userinfo,snsapi_friend,snsapi_message&state=weixin",
+              forceSafariVC: false,
+              webOnlyWindowName: "_self");
+          Application.router.pop(context);
+          // Application.router.navigateTo(context, Routes.home,
+          //     clearStack: true, transition: TransitionType.none);
+        });
+      } else {
+        Future.delayed(Duration.zero, () {
+          Wakelock.enable();
+        });
+      }
     }
     _myData = _dio.get(widget.url ?? "");
     _loadSuccess = false;
@@ -82,79 +91,85 @@ class _WebViewState extends State<GamePage> {
                     }),
               )
             : null,
-        appBar: AppBar(
-          title: Text(widget.game?.name ?? ""),
-        ),
-        body: widget.url == null
-            ? const Text("游戏不存在")
-            : FutureBuilder(
-                future: _myData,
-                builder: (BuildContext context, AsyncSnapshot snapshot) {
-                  final size = MediaQuery.of(context).size;
-                  final width = size.width;
-                  final height = size.height;
-                  //请求完成
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    //发生错误
-                    if (snapshot.hasError) {
-                      print(snapshot.error.toString());
-                      Future.delayed(Duration.zero, () {
-                        setState(() {
-                          _loadSuccess = true;
-                        });
-                      });
-                      return const Text("加载失败");
-                    }
-                    //请求成功
-                    if (!_loadSuccess) {
-                      Future.delayed(Duration.zero, () {
-                        setState(() {
-                          _loadSuccess = true;
-                        });
-                      });
-                    }
-                    return WebViewX(
-                        initialContent: _modifyHtml(snapshot.data.toString()),
-                        initialSourceType: SourceType.html,
-                        onWebViewCreated: (controller) =>
-                            webviewController = controller,
-                        jsContent: const {
-                          EmbeddedJsContent(
-                            webJs: "function postMsg(msg) { Callback(msg) }",
-                            mobileJs:
-                                "function postMsg(msg) { Callback.postMessage(msg) }",
-                          ),
-                        },
-                        dartCallBacks: {
-                          DartCallback(
-                              name: 'Callback',
-                              callBack: (msg) {
-                                Uri? uri = Uri.tryParse(msg.trimLeft());
-                                if (uri != null) {
-                                  switch (uri.authority) {
-                                    case "oauth":
-                                      String? code =
-                                          uri.queryParameters["code"];
-                                      launch(
-                                          "${uri.scheme}://${uri.authority}?code=$code",
-                                          forceSafariVC: false,
-                                          webOnlyWindowName: "_self");
-                                      break;
-                                    case "refresh":
-                                      _reload();
-                                      break;
-                                    default:
-                                      break;
-                                  }
-                                }
-                              })
-                        },
-                        width: width,
-                        height: height,
-                        javascriptMode: JavascriptMode.unrestricted);
-                  }
-                  return const Center(child: CircularProgressIndicator());
-                }));
+        appBar: isWx()
+            ? null
+            : AppBar(
+                title: Text(widget.game?.name ?? ""),
+              ),
+        body: isWx()
+            ? null
+            : widget.url == null
+                ? const Text("游戏不存在")
+                : FutureBuilder(
+                    future: _myData,
+                    builder: (BuildContext context, AsyncSnapshot snapshot) {
+                      final size = MediaQuery.of(context).size;
+                      final width = size.width;
+                      final height = size.height;
+                      //请求完成
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        //发生错误
+                        if (snapshot.hasError) {
+                          print(snapshot.error.toString());
+                          Future.delayed(Duration.zero, () {
+                            setState(() {
+                              _loadSuccess = true;
+                            });
+                          });
+                          return const Text("加载失败");
+                        }
+                        //请求成功
+                        if (!_loadSuccess) {
+                          Future.delayed(Duration.zero, () {
+                            setState(() {
+                              _loadSuccess = true;
+                            });
+                          });
+                        }
+                        return WebViewX(
+                            initialContent:
+                                _modifyHtml(snapshot.data.toString()),
+                            initialSourceType: SourceType.html,
+                            onWebViewCreated: (controller) =>
+                                webviewController = controller,
+                            jsContent: const {
+                              EmbeddedJsContent(
+                                webJs:
+                                    "function postMsg(msg) { Callback(msg) }",
+                                mobileJs:
+                                    "function postMsg(msg) { Callback.postMessage(msg) }",
+                              ),
+                            },
+                            dartCallBacks: {
+                              DartCallback(
+                                  name: 'Callback',
+                                  callBack: (msg) {
+                                    Uri? uri = Uri.tryParse(msg.trimLeft());
+                                    if (uri != null) {
+                                      switch (uri.authority) {
+                                        case "oauth":
+                                          String? code =
+                                              uri.queryParameters["code"];
+                                          launch(
+                                              "${uri.scheme}://${uri.authority}?code=$code",
+                                              forceSafariVC: false,
+                                              webOnlyWindowName: "_self");
+                                          break;
+                                        case "refresh":
+                                          _reload();
+                                          break;
+                                        default:
+                                          break;
+                                      }
+                                    }
+                                  })
+                            },
+                            width: width,
+                            height: height,
+                            javascriptMode: JavascriptMode.unrestricted);
+                      }
+                      return const Center(child: CircularProgressIndicator());
+                    }));
   }
 
   String _modifyHtml(String data) {
