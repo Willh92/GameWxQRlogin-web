@@ -7,7 +7,7 @@ import '../../bean/menu.dart';
 import '../../route/routes.dart';
 import '../../utils/formatter/TextInputFormatter.dart';
 import '../../widget/edit_widget.dart';
-import '../../widget/manu_item.dart';
+import '../../widget/menu_item.dart' as Menu;
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key, required this.title}) : super(key: key);
@@ -147,7 +147,7 @@ class _HomePageState extends State<HomePage> {
                         onTap: () {
                           _itemClick(g);
                         },
-                        child: MenuItem(game: g),
+                        child: Menu.MenuItem(game: g),
                       );
                     },
                     childCount: game.length,
